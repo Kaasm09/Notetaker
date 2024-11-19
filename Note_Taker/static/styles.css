@@ -1,0 +1,17 @@
+.navbar li {
+    margin-bottom: 1rem !important;
+    padding-right: 2rem !important;
+}
+
+.navbar ul {
+    width: 100%;
+}
+
+.right {
+    align-self: flex-end;
+}
+
+.navbar .navbar-brand {
+    float: left !important;
+    padding-left: 1rem;
+}

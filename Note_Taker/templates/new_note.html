@@ -1,0 +1,815 @@
+{% extends "layout.html" %}
+
+{% block main %}
+<script src="https://kit.fontawesome.com/57f5fb5754.js" crossorigin="anonymous"></script>
+<div class="menuItems rounded-1" style="height: 100vh; background-color: white;" id="menuContent">
+    <div class="collapse collapse-horizontal" id="menu">
+        <div class="container-fluid" style="width: 350px; height: 100%;">
+            <div class="row mt-2">
+                <div class="col">
+                    <span class="button-group" style="max-width:81.5px;">
+                        <div class="row">
+                            <div class="col">
+                                <button class="cir" style="background-color: turquoise;"></button>
+                                <button class="cir" style="background-color: tomato;"></button>
+                                <button class="cir" style="background-color: gold;"></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="cir" style="background-color: violet"></button>
+                                <button class="cir" style="background-color: lawngreen;"></button>
+                                <button class="cir" style="background-color: coral"></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="cir" style="background-color: royalblue"></button>
+                                <button class="cir" style="background-color: firebrick;"></button>
+                                <button class="cir" style="background-color: slategray"></button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col d-flex justify-content-center align-items-center">
+                                <button class="cir" style="background-color: black"></button>
+                            </div>
+                        </div>
+                    </span>
+                </div>
+                <div class="col d-flex justify-content-center align-items-center">
+                    <input type="color" id="color-input">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <div class="input-group align-items-center">
+                        <div class="input-group-prepend padding-right-2" style="padding-right: 5px">
+                            <button class="btn btn-secondary btn-sm" id="stroke-size-down">
+                                <i class="bi bi-caret-down-fill"></i>
+                            </button>
+                        </div>
+
+                        <input class="form-control rounded-2" id="stroke-size" style="width: 30px">
+
+                        <div class="input-group-append padding-left-2" style="padding-left: 5px">
+                            <button class="btn btn-secondary btn-sm" id="stroke-size-up">
+                                <i class="bi bi-caret-up-fill"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col mt-2">
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="click-type" id="type-paint" autocomplete="off"
+                            checked>
+                        <label class="btn btn-outline-secondary btn-light" for="type-paint">
+                            <i class="bi bi-brush"></i>
+                        </label>
+                        <input type="checkbox" class="btn-check" id="type-brain" autocomplete="off">
+                        <label class="btn btn-outline-secondary btn-light" for="type-brain"><i
+                                class="fa-solid fa-brain"></i>
+                        </label>
+                        <div class="me-1"></div>
+                        <input type="radio" class="btn-check" name="click-type" id="type-erase" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="type-erase">
+                            <i class="bi bi-eraser"></i>
+                        </label>
+                        <input type="radio" class="btn-check" name="click-type" id="type-textbox" autocompete="off">
+                        <label class="btn btn-outline-secondary" for="type-textbox">
+                            <i class="bi bi-bounding-box-circles"></i>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#save_note_modal">
+                        Save Note
+                    </button>
+
+                </div>
+            </div>
+            <div class="row mt-2" style="align-content: flex-end">
+                <button class="btn btn-primary" id="clear_button">clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<span class="menuItems me-auto mb-auto ms-3">
+    <button class="btn btn-secondary mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+        aria-expanded="false" aria-controls="collapseExample">
+        <i class="bi bi-sliders" style="font-size: 2rem"></i>
+    </button>
+</span>
+
+<canvas id="mainCanvas" style="z-index: 2; background-color: rgb(134, 180, 47)"></canvas>
+<canvas id="smartCanvas" style="background-color: rgb(134, 180, 47);z-index: 1"></canvas>
+<!-- Modal -->
+<div class="modal fade" id="save_note_modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true"
+    role="dialog" style="position:fixed">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="ModalLabel">Note name</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input class="form-control rounded-2" id="note_name">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save_note">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="text-areas" style="z-index: 3; width: 100%; height: 100%; position: absolute; pointer-events: none">
+    <span id="textarea-settings" style="height: 200px; z-index: -1; display: none"></span>
+    <button class="resize-node" id="top-left" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="top-middle" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="top-right" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="middle-left" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="middle-right" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="bottom-left" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="bottom-middle" style="z-index: -1; display: none; position: absolute">
+    </button>
+    <button class="resize-node" id="bottom-right" style="z-index: -1; display: none; position: absolute">
+    </button>
+</div>
+
+
+
+
+
+
+
+<style>
+    .collapse-horizontal.show {
+        position: relative;
+        display: flex;
+    }
+
+    .collapse-horizontal.show>.container-fluid {
+        overflow: auto;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .menuItems {
+        position: relative;
+        z-index: 5;
+        top: 0;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: start;
+    }
+
+    textarea {
+        resize: none;
+        background-color: transparent;
+    }
+
+    .cir {
+        border-radius: 50%;
+        height: 20px;
+        width: 20px;
+        border: none;
+        cursor: pointer;
+        margin: 1px;
+    }
+
+    .cir:hover {
+        transform: scale(1.2);
+    }
+
+    .cir:active {
+        transform: scale(1.2);
+    }
+
+    .resize-node {
+        border-radius: 50%;
+        height: 10px;
+        width: 5px;
+        margin: 1px;
+        border: none;
+        cursor: pointer;
+        background-color: gray;
+    }
+
+    .resize-node:hover {
+        transform: scale(1.2);
+    }
+
+    .resize-node:active {
+        transform: scale(1.2);
+    }
+
+    canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%
+    }
+
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+    }
+</style>
+<script>
+    zCount = 5
+    text_id = 0
+    document.addEventListener("DOMContentLoaded", function () {
+        // get the canvas and context
+        const canvas = document.getElementById('mainCanvas');
+        const smart_canvas = document.getElementById('smartCanvas')
+        const context = canvas.getContext('2d');
+        const smart_context = smart_canvas.getContext('2d')
+
+        // get the menu elements
+        let draw_type_elements = document.querySelectorAll(".btn-check[name='click-type']")
+        let textareas = document.querySelector(".text-areas")
+        let color_buttons = document.querySelectorAll('button.cir')
+        let color_input = document.querySelector('#color-input')
+        let stroke_size_input = document.querySelector("#stroke-size")
+        let stroke_size_up = document.querySelector("#stroke-size-up")
+        let stroke_size_down = document.querySelector("#stroke-size-down")
+        let clear_button = document.querySelector('#clear_button')
+        let brain = document.querySelector('#type-brain')
+
+        // get the main element
+        let main = document.querySelector("main")
+
+        // global variables needed for drawing functionality
+        let selected_draw_type = "type-paint"
+        let drawing = false;
+        let stroke_sizes = { "type-paint": 5, "type-erase": 5 };
+        let style = "black";
+        let smart_text = false
+
+        // global variables for textarea functionality
+        let lastX, lastY, textarea, resizing, span, offsetX, offsetY
+        let textarea_settings = document.getElementById('textarea-settings')
+        const resize_nodes = document.querySelectorAll(".resize-node")
+        let selected_textarea
+        let is_dragging = false
+
+
+        let all_textareas = document.querySelectorAll("textarea")
+
+        // initialize stroke size input box with correct value
+        stroke_size_input.value = stroke_sizes[selected_draw_type]
+
+        // initialize timeout variable
+        let timeout = false
+
+        // resize the canvas to the window
+        function canvasResize() {
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+            textareas.width = canvas.style.width
+            textareas.height = canvas.style.height
+            smart_canvas.height = window.innerHeight;
+            smart_canvas.width = window.innerWidth;
+            textareas.width = smart_canvas.style.width
+            textareas.height = smart_canvas.style.height
+        }
+
+        function mousedown(target) {
+            target.addEventListener('mousedown', function (e) {
+                drawing = true;
+
+                if (selected_draw_type == "type-textbox" && !is_dragging) {
+
+                    // get the mouse position relative to the offset of the textarea
+                    lastX = e.clientX - textareas.offsetLeft
+                    lastY = e.clientY - textareas.offsetTop
+
+                    //create the textarea element
+                    textarea = document.createElement("textarea")
+                    textareas.appendChild(textarea)
+                    // reselect all textareas to include current
+                    all_textareas = document.querySelectorAll("textarea")
+
+                    // styling for functionality
+                    textarea.style.zIndex = zCount
+                    textarea.style.left = lastX + 'px'
+                    textarea.style.top = lastY + 'px'
+                    textareas.style.pointerEvents = 'none'
+                    textarea.id = text_id
+                    text_id += 1
+
+                    // styling for quality of life
+                    textarea.style.width = "10px"
+                    textarea.style.height = "10px"
+                    textarea.style.position = 'absolute'
+                    textarea.style.pointerEvents = 'auto'
+
+                    // adjust z-index for the next textbox so that its on a different layer then the current one
+                    zCount += 1
+
+                    // add event listeners
+                    //add_resize_buttons(textarea)
+                    //update_selected_textarea(textarea)
+                }
+            });
+
+        }
+
+        canvas.addEventListener('mouseup', function () {
+            if (!smart_text) {
+                selected_textarea = null
+            } else {
+                selected_textarea.focus()
+            }
+        })
+
+        function mousemove(target, context) {
+            target.addEventListener('mousemove', function (e) {
+                if (drawing) {
+                    if (context == smart_context) {
+                        if (smart_text) {
+                            // functionality for painting
+                            if (selected_draw_type == "type-paint") {
+                                context.lineCap = 'round';
+
+                                // get the selected style
+                                context.strokeStyle = style;
+
+                                // get the line width for the current draw type
+                                context.lineWidth = parseFloat(stroke_sizes[selected_draw_type]);
+                                context.lineTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop);
+                                context.stroke();
+                                context.beginPath();
+                                context.moveTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop)
+                            }
+
+                            // functionality for erasing
+                            else if (selected_draw_type == "type-erase") {
+                                context.lineWidth = parseFloat(stroke_sizes[selected_draw_type]) + 10;
+                                context.lineCap = 'round';
+                                context.strokeStyle = target.style.backgroundColor
+                                console.log(context.strokeStyle)
+                                context.lineTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop);
+                                context.stroke();
+                                context.beginPath();
+                                context.moveTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop)
+                            }
+
+                            else if (selected_draw_type == "type-textbox") {
+                                // Update the size and position of the selection box as the mouse moves
+                                const width = e.clientX - textareas.offsetLeft - lastX;
+                                const height = e.clientY - textareas.offsetTop - lastY;
+                                textarea.style.width = Math.abs(width) + 'px';
+                                textarea.style.height = Math.abs(height) + 'px';
+                                textarea.style.left = (width > 0 ? lastX : event.clientX - textareas.offsetLeft) + 'px';
+                                textarea.style.top = (height > 0 ? lastY : event.clientY - textareas.offsetTop) + 'px';
+                                if (document.querySelectorAll("textarea").length > 0) {
+                                    all_textareas.forEach(function (textarea) {
+                                        textarea.style.pointerEvents = "none"
+                                    })
+                                }
+                                adjust_node_position(textarea)
+                            }
+                        }
+                    }
+                    else {
+                        // functionality for painting
+                        if (selected_draw_type == "type-paint" && !is_dragging) {
+                            context.lineCap = 'round';
+
+                            // get the selected style
+                            context.strokeStyle = style;
+
+                            // get the line width for the current draw type
+                            context.lineWidth = parseFloat(stroke_sizes[selected_draw_type]);
+                            context.lineTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop);
+                            context.stroke();
+                            context.beginPath();
+                            context.moveTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop)
+                        }
+
+                        // functionality for erasing
+                        else if (selected_draw_type == "type-erase" && !is_dragging) {
+                            context.lineWidth = parseFloat(stroke_sizes[selected_draw_type]) + 10;
+                            context.lineCap = 'round';
+                            context.strokeStyle = canvas.style.backgroundColor
+                            context.lineTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop);
+                            context.stroke();
+                            context.beginPath();
+                            context.moveTo(e.clientX - target.offsetLeft, e.clientY - target.offsetTop)
+                        }
+
+                        else if (selected_draw_type == "type-textbox" && !is_dragging) {
+                            // Update the size and position of the selection box as the mouse moves
+                            const width = e.clientX - textareas.offsetLeft - lastX;
+                            const height = e.clientY - textareas.offsetTop - lastY;
+                            textarea.style.width = Math.abs(width) + 'px';
+                            textarea.style.height = Math.abs(height) + 'px';
+                            textarea.style.left = (width > 0 ? lastX : event.clientX - textareas.offsetLeft) + 'px';
+                            textarea.style.top = (height > 0 ? lastY : event.clientY - textareas.offsetTop) + 'px';
+                            if (document.querySelectorAll("textarea").length > 0) {
+                                all_textareas.forEach(function (textarea) {
+                                    textarea.style.pointerEvents = "none"
+                                })
+                            }
+                            adjust_node_position(textarea)
+                            selected_textarea.focus()
+                        }
+                    }
+
+                }
+            });
+        }
+
+        brain.addEventListener('click', function () {
+            if (smart_text == true) {
+                smart_text = false
+            } else {
+                smart_text = true
+            }
+            console.log(smart_text)
+        })
+
+        function mouseup(context) {
+            document.addEventListener('mouseup', function () {
+                drawing = false;
+                // end the previous stroke
+                context.stroke();
+                context.beginPath();
+                add_resize_buttons(selected_textarea);
+
+                // turns the text areas pointer events if there is a text area in the screen
+                if (document.querySelectorAll("textarea").length > 0) {
+                    all_textareas.forEach(function (textarea) {
+                        textarea.style.pointerEvents = "auto"
+                    })
+                }
+            });
+        }
+
+        document.querySelector('#save_note').addEventListener('click', function () {
+            name = document.querySelector("#note_name").value
+            fetch('New_Note', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "textarea_data": textareas.innerHTML, "canvas_data": context.getImageData(0, 0, canvas.width, canvas.height), "canvas_name": name })
+            })
+        })
+
+        canvas.addEventListener('mouseup', function () {
+            console.log(smart_text)
+            if (selected_draw_type == 'type-paint' && smart_text == true) {
+                console.log('pulling data')
+                try {
+                    clearTimeout(timeout)
+                } catch { }
+                timeout = setTimeout(() => {
+                    const smart_canvas_data = smart_context.getImageData(0, 0, smart_canvas.width, smart_canvas.height)
+                    const raw_data = { "image_data": Array.from(smart_canvas_data.data), "canvas_height": smart_canvas.height, "canvas_width": smart_canvas.width }
+                    fetch('New_Note', {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(raw_data)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data['text'])
+                            try {
+                                selected_textarea.value += data['text']
+                            } catch { }
+                            console.log(data['text'])
+                            const main_canvas_data = context.getImageData(0, 0, canvas.width, canvas.height)
+                            xor = new Uint8ClampedArray(smart_canvas_data.data.length)
+                            for (let i = 0; i < smart_canvas_data.data.length; i++) {
+                                if (smart_canvas_data.data[i] == main_canvas_data.data[i]) {
+                                    main_canvas_data.data[i] = 0
+                                }
+
+                            }
+                            main_canvas_data.data = xor
+                            context.putImageData(main_canvas_data, 0, 0)
+                            smart_context.clearRect(0, 0, smart_canvas.width, smart_canvas.height)
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }, 5000)
+            }
+        })
+
+
+        // add event listeners to each preset color
+        for (button of color_buttons) {
+            button.addEventListener("click", function () {
+                let color = this.style.backgroundColor;
+                style = color;
+            });
+        }
+
+        // add event listener for the input of type color
+        color_input.addEventListener("change", function () {
+            style = color_input.value
+        })
+
+        // add event listener to the input for stroke size changing
+        stroke_size_input.addEventListener("change", function () {
+            change_stroke_size()
+            update_size_input()
+        })
+
+        // function to update the dict of the stroke size; called when stroke size input is changed and when buttons are clicked
+        function change_stroke_size() {
+            stroke_sizes[selected_draw_type] = stroke_size_input.value
+        }
+
+        // function to update the input box for the stroke size; called when stroke size  input is changed
+        function update_size_input() {
+            if (selected_draw_type != "type-textbox") {
+                stroke_size_input.value = stroke_sizes[selected_draw_type]
+            }
+        }
+        // add event listener to the button to increase the size of the input for stroke size changing
+        stroke_size_up.addEventListener("click", function () {
+            value = parseInt(stroke_size_input.value)
+            value += 1
+            stroke_size_input.value = value
+            change_stroke_size()
+        })
+
+        // add event listener to the button to decrease the size of the input for stroke size changing
+        stroke_size_down.addEventListener("click", function () {
+            value = parseInt(stroke_size_input.value)
+            value -= 1
+            stroke_size_input.value = value
+            change_stroke_size()
+        })
+
+        // updates the size depending on which draw type is clicked
+        for (type of draw_type_elements) {
+            type.addEventListener("click", function () {
+                if (this.id != "type-brain") {
+                    selected_draw_type = this.id
+                    update_size_input()
+                }
+            })
+        }
+
+        function add_resize_buttons(textarea) {
+            if (textarea instanceof HTMLElement) {
+                textarea.addEventListener("focus", function () {
+                    resize_node_logic(textarea)
+                    adjust_node_position(textarea)
+                    //adjust_textarea_settings(textarea)
+                })
+                textarea.addEventListener("blur", function () {
+                    hide_resize_nodes()
+                })
+            }
+
+        }
+
+        function hide_resize_nodes() {
+            resize_nodes.forEach(function (node) {
+                node.style.display = 'none'
+                node.style.zIndex = -1
+            })
+        }
+
+        canvas.addEventListener('mousedown', function () {
+            if (selected_textarea) {
+                const { left, top, right, bottom } = selected_textarea.getBoundingClientRect();
+                console.log(event.clientX, event.clientY)
+                if ((event.clientX - 10 >= left && event.clientX + 10 <= right) && (event.clientY + 10 >= top && event.clientY - 10 <= bottom)) {
+                    is_dragging = true;
+                    offsetX = event.clientX - left;
+                    offsetY = event.clientY - top
+                }
+            }
+        })
+        document.addEventListener('mousemove', ({ clientX, clientY }) => {
+            if (is_dragging && selected_textarea) {
+                selected_textarea.style.left = `${clientX - offsetX - textareas.getBoundingClientRect().left}px`;
+                selected_textarea.style.top = `${clientY - offsetY - textareas.getBoundingClientRect().top}px`;
+                adjust_node_position(selected_textarea)
+                selected_textarea.focus()
+            }
+        });
+
+        document.addEventListener('mouseup', function () {
+            is_dragging = false;
+        });
+
+        function adjust_node_position(textarea) {
+            const textarea_rect = textarea.getBoundingClientRect();
+            const textareas_rect = textareas.getBoundingClientRect();
+            console.log(textarea_rect)
+            console.log(event.clientX, event.clientY)
+
+            resize_nodes.forEach(function (node) {
+                selected_textarea = textarea
+                const node_rect = node.getBoundingClientRect();
+                node.style.zIndex = zCount + 1;
+                node.style.display = 'block';
+                node.style.pointerEvents = 'auto'
+                if (node.id == "top-left") {
+                    node.style.top = (textarea_rect.top - (node_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.left - (node_rect.width / 2) - textareas_rect.left) + 'px';
+                } else if (node.id == "top-middle") {
+                    node.style.top = (textarea_rect.top - (node_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.left - (node_rect.width / 2) + (textarea_rect.width / 2) - textareas_rect.left) + 'px';
+                } else if (node.id == "top-right") {
+                    node.style.top = (textarea_rect.top - (node_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.right - (node_rect.width / 2) - textareas_rect.left) + 'px'
+                } else if (node.id == "middle-left") {
+                    node.style.top = (textarea_rect.top - (node_rect.height / 2) + (textarea_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.left - (node_rect.width / 2) - textareas_rect.left) + 'px'
+                } else if (node.id == "middle-right") {
+                    node.style.top = (textarea_rect.top - (node_rect.height / 2) + (textarea_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.right - (node_rect.width / 2) - textareas_rect.left) + 'px';
+                } else if (node.id == "bottom-left") {
+                    node.style.top = (textarea_rect.bottom - (node_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.left - (node_rect.width / 2) - textareas_rect.left) + 'px';
+                } else if (node.id == "bottom-middle") {
+                    node.style.top = (textarea_rect.bottom - (node_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.left - (node_rect.width / 2) + (textarea_rect.width / 2) - textareas_rect.left) + 'px';
+                } else if (node.id == "bottom-right") {
+                    node.style.top = (textarea_rect.bottom - (node_rect.height / 2) - textareas_rect.top) + 'px';
+                    node.style.left = (textarea_rect.right - (node_rect.width / 2) - textareas_rect.left) + 'px';
+                }
+            })
+        }
+
+        function update_selected_textarea(target) {
+            target.addEventListener('click', function () {
+                all_textareas.forEach(function (textarea) {
+                    try {
+                        textarea.classList.remove('selected')
+                    } catch { }
+                })
+                target.classList.add('selected')
+                selected_textarea = target
+            })
+        }
+
+        window.addEventListener('click', function () {
+            console.log(selected_textarea)
+        })
+
+        function resize_node_logic() {
+            resize_nodes.forEach(function (node) {
+                node.addEventListener("mousedown", function (event) {
+                    /*const initialRight = parseFloat(getComputedStyle(selected_textarea).right)
+                    const initialLeft = parseFloat(getComputedStyle(selected_textarea).left)
+                    const initialTop = parseFloat(getComputedStyle(selected_textarea).top)
+                    const initialBottom = parseFloat(getComputedStyle(selected_textarea).bottom)
+                    const textarea = selected_textarea;
+                    
+                    */
+                    const textareas_rect = document.querySelector(".text-areas").getBoundingClientRect();
+                    const textarea_rect = textarea.getBoundingClientRect()
+                    const initialX = event.clientX;
+                    const initialY = event.clientY;
+                    const initialWidth = parseFloat(getComputedStyle(textarea).width);
+                    const initialHeight = parseFloat(getComputedStyle(textarea).height);
+
+                    function handleResize(event) {
+                        const offsetX = event.clientX - initialX;
+                        const offsetY = event.clientY - initialY;
+                        let newWidth, newHeight;
+                        adjust_node_position(textarea)
+                        adjust_textarea_settings(textarea)
+                        if (node.id == "top-left") {
+                            newWidth = initialWidth - offsetX;
+                            newHeight = initialHeight - offsetY;
+                            if (newHeight > 0 && newWidth > 0) {
+                                textarea.style.width = newWidth + 'px';
+                                textarea.style.height = newHeight + 'px';
+                                textarea.style.left = (textarea_rect.left + offsetX) - textareas_rect.left + 'px';
+                                textarea.style.top = (textarea_rect.top + offsetY) - textareas_rect.top + 'px';
+                            }
+
+                        } else if (node.id == "top-right") {
+                            newWidth = initialWidth + offsetX;
+                            newHeight = initialHeight - offsetY;
+                            if (newHeight > 0 && newWidth > 0) {
+                                textarea.style.width = newWidth + 'px';
+                                textarea.style.height = newHeight + 'px';
+                                textarea.style.top = (textarea_rect.top + offsetY) - textareas_rect.top + 'px';
+                            }
+                        } else if (node.id == "top-middle") {
+                            newHeight = initialHeight - offsetY;
+                            if (newHeight > 0) {
+                                textarea.style.height = newHeight + 'px'
+                                textarea.style.top = (textarea_rect.top + offsetY) - textareas_rect.top + 'px';
+                            }
+                        } else if (node.id == "middle-left") {
+                            newWidth = initialWidth - offsetX;
+                            if (newWidth > 0) {
+                                textarea.style.width = newWidth + 'px';
+                                textarea.style.left = (textarea_rect.left + offsetX) + 'px';
+                            }
+                        } else if (node.id == "middle-right") {
+                            newWidth = initialWidth + offsetX;
+                            if (newWidth > 0) {
+                                textarea.style.width = newWidth + 'px';
+                            }
+                        } else if (node.id == "bottom-left") {
+                            newWidth = initialWidth - offsetX;
+                            newHeight = initialHeight + offsetY;
+                            if (newHeight > 0 && newWidth > 0) {
+                                textarea.style.width = newWidth + 'px';
+                                textarea.style.height = newHeight + 'px';
+                                textarea.style.left = (textarea_rect.left + offsetX) + 'px';
+                            }
+                        } else if (node.id == "bottom-middle") {
+                            newHeight = initialHeight + offsetY;
+                            if (newHeight > 0) {
+                                textarea.style.height = newHeight + 'px';
+                            }
+                        } else if (node.id == "bottom-right") {
+                            newWidth = initialWidth + offsetX;
+                            newHeight = initialHeight + offsetY;
+                            if (newHeight > 0 && newWidth > 0) {
+                                textarea.style.width = newWidth + 'px';
+                                textarea.style.height = newHeight + 'px';
+                            }
+                        }
+
+                    }
+
+                    function stopResize() {
+
+                        document.removeEventListener("mousemove", handleResize);
+                        document.removeEventListener("mouseup", stopResize);
+                    }
+
+                    document.addEventListener("mousemove", handleResize);
+                    document.addEventListener("mouseup", stopResize);
+                });
+            });
+
+
+            document.addEventListener("mouseup", function () {
+                resizing = false
+            });
+        }
+
+        function adjust_textarea_settings(textarea) {
+            textarea_settings.zIndex = zCount + 20
+            //textarea_settings.style.display = 'block'
+            textarea_settings.style.width = textarea.style.width
+            textarea_settings.style.left = textarea.getBoundingClientRect().left - textareas.getBoundingClientRect().left
+            textarea_settings.style.bottom = textarea.getBoundingClientRect().top
+        }
+
+
+        window.addEventListener('keydown', function (e) {
+            if (e.key = 'backspace' && selected_textarea != null) {
+                selected_textarea.remove()
+                hide_resize_nodes
+            };
+        }, false);
+
+        // changes the canvas size to match the window size
+        window.addEventListener("resize", canvasResize)
+
+        // changes the canvas size initially
+        canvasResize()
+
+        clear_button.addEventListener('click', function () {
+            context.clearRect(0, 0, canvas.width, canvas.height)
+            try {
+                clearTimeout(timout)
+            } catch { }
+        })
+        mousedown(canvas)
+        mousedown(smart_canvas)
+        mousemove(canvas, context)
+        mousemove(canvas, smart_context)
+        mouseup(context)
+        mouseup(smart_context)
+    });
+
+
+</script>
+
+{% endblock %}
